@@ -1,18 +1,18 @@
-using Documenter, RandomizedAlgorithms
+using Documenter, RandomizedLinAlg
 
 makedocs(
-    modules = [RandomizedAlgorithms],
+    modules = [RandomizedLinAlg],
     format = :html,
     doctest = false,
     clean = true,
-    sitename = "RandomizedAlgorithms.jl",
+    sitename = "RandomizedLinAlg.jl",
     pages = [
         "Home" => "index.md",
     ]
 )
 
 deploydocs(
-    repo = "github.com/haampie/RandomizedAlgorithms.jl.git",
+    repo = "github.com/haampie/RandomizedLinAlg.jl.git",
     target = "build",
     osname = "linux",
     julia  = "0.6",

@@ -1,6 +1,6 @@
-# [Randomized algorithms](@id Randomized)
+# [Randomized Linear Algebra](@id Randomized)
 
-RandomizedAlgorithms.jl is a Julia package that provides some randomized algorithms for numerical linear algebra as advocated in [^Halko2011].
+RandomizedLinAlg.jl is a Julia package that provides some randomized algorithms for numerical linear algebra as advocated in [^Halko2011].
 
 ```@docs
 reig

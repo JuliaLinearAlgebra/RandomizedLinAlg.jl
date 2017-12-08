@@ -1,4 +1,4 @@
-using RandomizedAlgorithms
+using RandomizedLinAlg
 using Base.Test
 
 @testset "rsvd_fnkz" begin

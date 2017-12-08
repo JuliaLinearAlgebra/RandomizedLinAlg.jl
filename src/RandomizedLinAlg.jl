@@ -1,9 +1,9 @@
 __precompile__(true)
 """
-Main module for `RandomizedAlgorithms.jl` -- a Julia package
+Main module for `RandomizedLinAlg.jl` -- a Julia package
 for randomized methods in numerical linear algebra.
 """
-module RandomizedAlgorithms
+module RandomizedLinAlg
 
 include("rlinalg.jl")
 include("rsvd.jl")

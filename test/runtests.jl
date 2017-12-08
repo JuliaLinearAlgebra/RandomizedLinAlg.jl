@@ -1,4 +1,4 @@
-using RandomizedAlgorithms
+using RandomizedLinAlg
 
 include("rlinalg.jl")
 include("rsvd.jl")
