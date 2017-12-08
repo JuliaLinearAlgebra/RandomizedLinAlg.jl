@@ -1,4 +1,3 @@
-
 export rsvd_fnkz
 
 struct OuterProduct{T}

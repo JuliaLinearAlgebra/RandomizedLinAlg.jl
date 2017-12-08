@@ -1,4 +1,3 @@
-using IterativeSolvers
 using Base.Test
 
 @testset "Randomized Linear Algebra" begin
@@ -26,6 +25,6 @@ l, u = reigmax(A, k, p)
 l, u = rcond(A, k, p)
 @test l ≤ cond(A) ≤ u
 
-@test_throws ArgumentError IterativeSolvers.randnn(Char, m)
-@test_throws ArgumentError IterativeSolvers.randnn(Char, m, n)
+@test_throws ArgumentError RandomizedAlgorithms.randnn(Char, m)
+@test_throws ArgumentError RandomizedAlgorithms.randnn(Char, m, n)
 end

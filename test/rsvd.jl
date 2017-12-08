@@ -1,4 +1,3 @@
-using IterativeSolvers
 using Base.Test
 
 @testset "rsvd" begin
@@ -41,7 +40,7 @@ end
     A = randn(n, r) * randn(r, n)
     S = svdvals(A)
     for nvals = 1 : r
-        S1 = IterativeSolvers.rsvdvals(A, nvals, r - nvals)
+        S1 = RandomizedAlgorithms.rsvdvals(A, nvals, r - nvals)
         for i = 1 : nvals
             @test abs(S[i] - S1[i]) ≤ n^2 * r * eps()
         end
@@ -50,11 +49,11 @@ end
 
 @testset "rrange_adaptive" begin
     A = [1. 2 3; 4 5 6; 7 8 9]
-    @test size(IterativeSolvers.rrange_adaptive(A, 3, 1e-3)) == (3,2)
+    @test size(RandomizedAlgorithms.rrange_adaptive(A, 3, 1e-3)) == (3,2)
 end
 
 @testset "rrange" begin
     A = [1. 2 3; 4 5 6; 7 8 9]
-    @test_throws ArgumentError IterativeSolvers.rrange(A, 20)
+    @test_throws ArgumentError RandomizedAlgorithms.rrange(A, 20)
 end
 end

@@ -1,4 +1,4 @@
-using IterativeSolvers
+using RandomizedAlgorithms
 using Base.Test
 
 @testset "rsvd_fnkz" begin
