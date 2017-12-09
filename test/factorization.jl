@@ -1,4 +1,4 @@
-using IterativeSolvers
+using RandomizedLinAlg
 using Base.Test
 
 @testset "IDfact" begin

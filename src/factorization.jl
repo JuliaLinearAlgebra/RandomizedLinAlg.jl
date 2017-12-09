@@ -82,7 +82,7 @@ function idfact(A, k::Int, l::Int)
     Y = R * A #size l x n
 
     #Compute column pivots of first k columns of Y
-    maxvals = map(j->maximum(abs(view(Y, :, j))), 1:n)
+    maxvals = map(j->maximum(abs.(view(Y, :, j))), 1:n)
     piv = sortperm(maxvals, rev=true)[1:k]
 
     B = A[:, piv]
