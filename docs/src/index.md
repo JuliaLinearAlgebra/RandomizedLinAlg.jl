@@ -28,6 +28,12 @@ rnorm
 rnorms
 ```
 
+## Interpolative Decomposition
+
+```@docs
+idfact
+```
+
 [^Halko2011]: Halko, Nathan, Per-Gunnar Martinsson, and Joel A. Tropp. "Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions." SIAM review 53.2 (2011): 217-288.
 
 [^Dixon1983]: Dixon, John D. "Estimating extremal eigenvalues and condition numbers of matrices." SIAM Journal on Numerical Analysis 20.4 (1983): 812-814.
