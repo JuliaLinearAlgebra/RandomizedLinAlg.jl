@@ -101,7 +101,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Norm estimate",
     "category": "section",
-    "text": "rnorm\nrnorms[Halko2011]: Halko, Nathan, Per-Gunnar Martinsson, and Joel A. Tropp. \"Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions.\" SIAM review 53.2 (2011): 217-288.[Dixon1983]: Dixon, John D. \"Estimating extremal eigenvalues and condition numbers of matrices.\" SIAM Journal on Numerical Analysis 20.4 (1983): 812-814.[Liberty2007]: Liberty, Edo, et al. \"Randomized algorithms for the low-rank approximation of matrices.\" Proceedings of the National Academy of Sciences 104.51 (2007): 20167-20172."
+    "text": "rnorm\nrnorms"
+},
+
+{
+    "location": "index.html#RandomizedLinAlg.idfact",
+    "page": "Home",
+    "title": "RandomizedLinAlg.idfact",
+    "category": "Function",
+    "text": "idfact(A, k, l)\n\nCompute and return the interpolative decomposition of A: A ≈ B * P\n\nWhere:\n\nB's columns are a subset of the columns of A\nsome subset of P's columns are the k x k identity, no entry of P exceeds magnitude 2, and\n||B * P - A|| ≲ σ(A, k+1), the (k+1)st singular value of A.\n\nArguments\n\nA: Matrix to factorize\n\nk::Int: Number of columns of A to return in B\n\nl::Int: Length of random vectors to project onto\n\nOutput\n\n(::Interpolative): interpolative decomposition.\n\nImplementation note\n\nThis is a hacky version of the algorithms described in \\cite{Liberty2007} and \\cite{Cheng2005}. The former refers to the factorization (3.1) of the latter.  However, it is not actually necessary to compute this factorization in its entirely to compute an interpolative decomposition.\n\nInstead, it suffices to find some permutation of the first k columns of Y = R * A, extract the subset of A into B, then compute the P matrix as B\\A which will automatically compute P using a suitable least-squares algorithm.\n\nThe approximation we use here is to compute the column pivots of Y, rather then use the true column pivots as would be computed by a column- pivoted QR process.\n\nReferences\n\n\\cite[Algorithm I]{Liberty2007}\n\n@article{Cheng2005,\n    author = {Cheng, H and Gimbutas, Z and Martinsson, P G and Rokhlin, V},\n    doi = {10.1137/030602678},\n    issn = {1064-8275},\n    journal = {SIAM Journal on Scientific Computing},\n    month = jan,\n    number = {4},\n    pages = {1389--1404},\n    title = {On the Compression of Low Rank Matrices},\n    volume = {26},\n    year = {2005}\n}\n\n\n\n"
+},
+
+{
+    "location": "index.html#Interpolative-Decomposition-1",
+    "page": "Home",
+    "title": "Interpolative Decomposition",
+    "category": "section",
+    "text": "idfact[Halko2011]: Halko, Nathan, Per-Gunnar Martinsson, and Joel A. Tropp. \"Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions.\" SIAM review 53.2 (2011): 217-288.[Dixon1983]: Dixon, John D. \"Estimating extremal eigenvalues and condition numbers of matrices.\" SIAM Journal on Numerical Analysis 20.4 (1983): 812-814.[Liberty2007]: Liberty, Edo, et al. \"Randomized algorithms for the low-rank approximation of matrices.\" Proceedings of the National Academy of Sciences 104.51 (2007): 20167-20172."
 },
 
 ]}
