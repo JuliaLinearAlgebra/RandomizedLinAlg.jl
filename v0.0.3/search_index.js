@@ -9,6 +9,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "index.html#RandomizedLinAlg.reigen",
+    "page": "Home",
+    "title": "RandomizedLinAlg.reigen",
+    "category": "function",
+    "text": "reigen(A, l)\n\nCompute the spectral (Eigen) decomposition of A using a randomized algorithm.\n\nArguments\n\nA: input matrix.\nl::Int: number of eigenpairs to find.\n\nOutput\n\n::LinearAlgebra.Eigen: eigen decomposition.\n\nImplementation note\n\nThis is a wrapper around eigen_onepass() which uses the randomized samples found using srft(l).\n\n\n\n\n\n"
+},
+
+{
+    "location": "index.html#RandomizedLinAlg.rsvd",
+    "page": "Home",
+    "title": "RandomizedLinAlg.rsvd",
+    "category": "function",
+    "text": "rsvd(A, n, p=0)\n\nCompute partial singular value decomposition of A using a randomized algorithm.\n\nArguments\n\nA: input matrix.\n\nn::Int: number of singular value/vector pairs to find.\n\np::Int=0: number of extra vectors to include in computation.\n\nOutput\n\n::SVD: singular value decomposition.\n\nwarning: Accuracy\nThis variant of the randomized singular value decomposition is the most commonly found implementation but is not recommended for accurate computations, as it often has trouble finding the n largest singular pairs, but rather finds n large singular pairs which may not necessarily be the largest.\n\nImplementation note\n\nThis function calls rrange, which uses naive randomized rangefinding to compute a basis for a subspace of dimension n (Algorithm 4.1 of [Halko2011]), followed by svd_restricted(), which computes the exact SVD factorization on the restriction of A to this randomly selected subspace (Algorithm 5.1 of [Halko2011]).\n\nAlternatively, you can mix and match your own randomized algorithm using any of the randomized range finding algorithms to find a suitable subspace and feeding the result to one of the routines that computes the SVD restricted to that subspace.\n\n\n\n\n\n"
+},
+
+{
+    "location": "index.html#RandomizedLinAlg.rsvd_fnkz",
+    "page": "Home",
+    "title": "RandomizedLinAlg.rsvd_fnkz",
+    "category": "function",
+    "text": "rsvd_fnkz(A, k)\n\nCompute the randomized SVD by iterative refinement from randomly selected columns/rows [Friedland2006].\n\nArguments\n\nA: matrix whose SVD is desired;\nk::Int: desired rank of approximation (k ≤ min(m, n)).\n\nKeywords\n\nl::Int = k: number of columns/rows to sample at each iteration (1 ≤ l ≤ k);\nN::Int = minimum(size(A)): maximum number of iterations;\nϵ::Real = prod(size(A))*eps(): relative threshold for convergence, as measured by growth of the spectral norm;\nmethod::Symbol = :eig: problem to solve.\n:eig: eigenproblem.\n:svd: singular problem.\nverbose::Bool = false: print convergence information at each iteration.\n\nReturn value\n\nSVD object of rank ≤ k.\n\n[Friedland2006]: Friedland, Shmuel, et al. \"Fast Monte-Carlo low rank approximations for  matrices.\" System of Systems Engineering, 2006 IEEE/SMC International  Conference on. IEEE, 2006.\n\n\n\n\n\n"
+},
+
+{
     "location": "index.html#Randomized-1",
     "page": "Home",
     "title": "Randomized Linear Algebra",
