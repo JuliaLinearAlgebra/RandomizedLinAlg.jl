@@ -1,5 +1,7 @@
 export rsvd_fnkz
 
+using LinearAlgebra: SVD
+
 struct OuterProduct{T}
     X :: Matrix{T}
     Y :: Matrix{T}
@@ -43,12 +45,12 @@ function rsvd_fnkz(A, k::Int;
     method::Symbol=:eig,
     ϵ::Real=prod(size(A))*eps(real(float(one(eltype(A))))))
 
-    const m, n = size(A)
-    const dosvd = method == :svd
+    m, n = size(A)
+    dosvd = method == :svd
     @assert 1 ≤ l ≤ k ≤ min(m, n)
 
     #Initialize k-rank approximation B₀ according to (III.9)
-    const tallandskinny = m ≥ n
+    tallandskinny = m ≥ n
     B₀ = if tallandskinny
         #Select k columns of A
         π = randperm(n)[1:k]
@@ -59,8 +61,8 @@ function rsvd_fnkz(A, k::Int;
         π = randperm(m)[1:k]
         A[π, :]
     end
-    X, RRR = qr(B₀)
-    X = X[:, abs.(diag(RRR)) .> ϵ] #Remove linear dependent columns
+    QQQ, RRR = qr(B₀)
+    X = Matrix(QQQ)[:, abs.(diag(RRR)) .> ϵ] #Remove linear dependent columns
     B = tallandskinny ? X ⊗ A'X : X ⊗ X'A
 
     oldnrmB = 0.0
@@ -70,18 +72,18 @@ function rsvd_fnkz(A, k::Int;
     for t=1:N
         π = randperm(k)[1:l]
         #Update B using Theorem 2.4
-        X, RRR = qr([B.X A[:, π]]) #We are doing more work than needed here
-        X = X[:, abs.(diag(RRR)) .> ϵ] #Remove linearly dependent columns
+        QQQ, RRR = qr([B.X A[:, π]]) #We are doing more work than needed here
+        X = Matrix(QQQ)[:, abs.(diag(RRR)) .> ϵ] #Remove linearly dependent columns
         Y = A'X
         if dosvd
-            S = svdfact!(Y)
-            Λ = S[:S].^2
-            B = (X * S[:V]) ⊗ (S[:U]*Diagonal(S[:S]))
+            S = svd!(Y)
+            Λ = S.S.^2
+            B = (X * S.V) ⊗ (S.U*Diagonal(S.S))
         else
-            E = eigfact!(Symmetric(Y'Y))
-            π = sortperm(E[:values], rev=true)[1:min(length(E[:values]), k)]
-            Λ = E[:values][π]
-            O = E[:vectors][:, π] #Eq. 2.6
+            E = eigen!(Symmetric(Y'Y))
+            π = sortperm(E.values, rev=true)[1:min(length(E.values), k)]
+            Λ = E.values[π]
+            O = E.vectors[:, π] #Eq. 2.6
             X̃ = X * O
             B = X̃ ⊗ A'X̃
         end
@@ -94,7 +96,7 @@ function rsvd_fnkz(A, k::Int;
         oldnrmB = nrmB
     end
     for i=1:size(B.Y, 2)
-        scale!(view(B.Y, :, i), 1/√Λ[i])
+        rmul!(view(B.Y, :, i), 1/√Λ[i])
     end
-    Base.LinAlg.SVD(B.X, sqrt.(Λ), B.Y')
+    SVD(B.X, sqrt.(Λ), B.Y')
 end
