@@ -2,13 +2,13 @@
 # Specialized factorizations
 ############################
 
-export idfact
+export id
 
 """
 An interpolative decomposition.
 
 For a matrix `A`, the interpolative decomposition `F` contains the matrices `B`
-and `P` computed by `idfact()`. See the documentation of `idfact()` for details.
+and `P` computed by `id()`. See the documentation of `id()` for details.
 
 # References
 
@@ -20,7 +20,7 @@ struct Interpolative{T} <: Factorization{T}
 end
 
 """
-    idfact(A, k, l)
+    id(A, k, l)
 
 Compute and return the interpolative decomposition of `A`: A ≈ B * P
 
@@ -76,7 +76,7 @@ pivoted QR process.
 }
 ```
 """
-function idfact(A, k::Int, l::Int)
+function id(A, k::Int, l::Int)
     m, n = size(A)
     R = randn(l, m)
     Y = R * A #size l x n
