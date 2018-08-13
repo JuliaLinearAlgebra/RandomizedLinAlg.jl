@@ -6,7 +6,7 @@
 # value decomposition and spectral (eigen-) decomposition as described in
 # [^Halko2011].
 
-import Base.LinAlg: Eigen, SVD
+import LinearAlgebra: Eigen, SVD
 
 export rsvdfact, reig
 
@@ -116,7 +116,7 @@ vectors of the computed subspace of `A`.
 # Implementation note
 
 Whereas [^Halko2011] recommends classical Gram-Schmidt with double
-reorthogonalization, we instead compute the basis with `qrfact()`, which
+reorthogonalization, we instead compute the basis with `qr()`, which
 for dense `A` computes the QR factorization using Householder reflectors.
 """
 function rrange(A, l::Int=0)
@@ -126,7 +126,7 @@ function rrange(A, l::Int=0)
     end
     Ω = randn(n, l)
     Y = A*Ω
-    Q = full(qrfact!(Y)[:Q])
+    Q = Matrix(qr!(Y).Q)
     @assert m==size(Q, 1)
     @assert l==size(Q, 2)
     return Q
@@ -167,7 +167,7 @@ function rrange_adaptive(A, r::Integer, ϵ::Real=eps(); maxiter::Int=10)
     Y = A*Ω
     Q = zeros(m,0)
 
-    const tol=ϵ/(10*√(2/π))
+    tol = ϵ / (10*√(2/π))
     for j=1:maxiter
         Tol = maximum([norm(Y[:,i]) for i=j:(j+r-1)])
         Tol > tol || break
@@ -188,6 +188,8 @@ function rrange_adaptive(A, r::Integer, ϵ::Real=eps(); maxiter::Int=10)
     end
     Q
 end
+
+basis(V) = Matrix(qr(V).Q)
 
 """
     rrange_si(A, l; At=A', q=0)
@@ -217,7 +219,7 @@ randomized rangefinding by subspace iteration.
 # Implementation note
 
 Whereas the Reference recommends classical Gram-Schmidt with double
-reorthogonalization, we instead compute the basis with `qrfact()`, which
+reorthogonalization, we instead compute the basis with `qr()`, which
 for dense A computes the QR factorization using Householder reflectors.
 
 # References
@@ -225,7 +227,6 @@ for dense A computes the QR factorization using Householder reflectors.
 Algorithm 4.4 of [^Halko2011]
 """
 function rrange_si(A, l::Int; At=A', q::Int=0)
-    basis=x->full(qrfact(x)[:Q])
     n = size(A, 2)
     Ω = randn(n,l+p)
     Y = A*Ω
@@ -262,7 +263,7 @@ naive randomized rangefinding using stochastic randomized Fourier transforms.
 # Implementation note
 
 Whereas the Reference recommends classical Gram-Schmidt with double
-reorthogonalization, we instead compute the basis with `qrfact()`, which
+reorthogonalization, we instead compute the basis with `qr()`, which
 for dense `A` computes the QR factorization using Householder reflectors.
 
 # References
@@ -273,7 +274,7 @@ function rrange_f(A, l::Int)
     n = size(A, 2)
     Ω = srft(l+p)
     Y = A*Ω
-    Q = full(qrfact!(Y)[:Q])
+    Q = Matrix(qr!(Y).Q)
 end
 
 """
@@ -298,8 +299,8 @@ Algorithm 5.1 of [^Halko2011]
 """
 function svdfact_restricted(A, Q, n::Int)
     B=Q'A
-    S=svdfact!(B)
-    SVD((Q*S[:U])[:, 1:n], S[:S][1:n], S[:Vt][1:n, :])
+    S=svd!(B)
+    SVD((Q*S.U)[:, 1:n], S.S[1:n], S.Vt[1:n, :])
 end
 
 """
@@ -360,8 +361,8 @@ function svdfact_re(A, Q)
     X, J = F[:B], F[:P]
     R′, W′= qr(A[J, :])
     Z = X*R′
-    S=svdfact(Z)
-    SVD(S[:U], S[:S], S[:Vt]*W′)
+    S=svd(Z)
+    SVD(S.U, S.S, S.Vt * W′)
 end
 
 """
@@ -378,7 +379,7 @@ spanned by `Q` using row extraction.
 
 # Output
 
-- `::Base.LinAlg.Eigen`: eigen factorization.
+- `::LinearAlgebra.Eigen`: eigen factorization.
 
 # References
 
@@ -386,8 +387,8 @@ Algorithm 5.3 of [^Halko2011]
 """
 function eigfact_restricted(A::Hermitian, Q)
     B = Q'A*Q
-    E = eigfact!(B)
-    Eigen(E[:values], Q*E[:vectors])
+    E = eigen!(B)
+    Eigen(E.values, Q*E.vectors)
 end
 
 """
@@ -407,7 +408,7 @@ where `Ω` is a sample computed by `randn(n,l)` or even `srft(l)`.
 
 # Output
 
-- `::Base.LinAlg.Eigen`: eigen factorization.
+- `::LinearAlgebra.Eigen`: eigen factorization.
 
 # See also
 
@@ -420,11 +421,11 @@ Algorithm 5.4 of [^Halko2011]
 """
 function eigfact_re(A::Hermitian, Q)
     X, J = idfact(Q)
-    F = qrfact!(X)
-    V, R = F[:Q], F[:R]
+    F = qr!(X)
+    V, R = F.Q, F.R
     Z=R*A[J, J]*R'
-    E=eigfact(Z)
-    Eigen(E[:values], V*E[:vectors])
+    E=eigen(Z)
+    Eigen(E.values, V*E.vectors)
 end
 
 """
@@ -441,7 +442,7 @@ spanned by `Q` using the Nyström method.
 
 # Output
 
-- `::Base.LinAlg.Eigen`: eigen factorization.
+- `::LinearAlgebra.Eigen`: eigen factorization.
 
 # See also
 
@@ -457,8 +458,8 @@ function eigfact_nystrom(A, Q)
     B₂=Q'*B₁
     C=cholfact!(B₂)
     F=B₁*inv(C)
-    S=svdfact!(F)
-    Eigen(S[:S].^2, S[:U])
+    S=svd!(F)
+    Eigen(S.S.^2, S.U)
 end
 
 """
@@ -483,14 +484,14 @@ product involving `A`.
 Algorithm 5.6 of [^Halko2011]
 """
 function eigfact_onepass(A::Hermitian, Ω)
-    Y=A*Ω; Q = full(qrfact!(Y)[:Q])
+    Y=A*Ω; Q = Matrix(qr!(Y).Q)
     B=(Q'Y)\(Q'Ω)
     E=eigfact!(B)
     Eigen(E[:values], Q*E[:vectors])
 end
 function eigfact_onepass(A, Ω, Ω̃; At=A')
-    Y=A *Ω; Q = full(qrfact!(Y)[:Q])
-    Ỹ=At*Ω; Q̃ = full(qrfact!(Ỹ)[:Q])
+    Y=A *Ω; Q = Matrix(qr!(Y).Q)
+    Ỹ=At*Ω; Q̃ = Matrix(qr!(Ỹ).Q)
     #Want least-squares solution to (5.14 and 5.15)
     B=(Q'Y)\(Q̃'Ω)
     B̃=(Q̃'Ỹ)\(Q'Ω̃)
@@ -513,7 +514,7 @@ algorithm.
 
 # Output
 
-- `::Base.LinAlg.Eigen`: eigen decomposition.
+- `::LinearAlgebra.Eigen`: eigen decomposition.
 
 # Implementation note
 
