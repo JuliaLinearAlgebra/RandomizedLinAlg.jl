@@ -8,7 +8,7 @@
 
 import LinearAlgebra: Eigen, SVD
 
-export rsvd, reig
+export rsvd, reigen
 
 """
     rsvd(A, n, p=0)
