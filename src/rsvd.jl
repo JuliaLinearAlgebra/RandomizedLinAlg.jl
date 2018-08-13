@@ -8,10 +8,10 @@
 
 import LinearAlgebra: Eigen, SVD
 
-export rsvdfact, reig
+export rsvd, reig
 
 """
-    rsvdfact(A, n, p=0)
+    rsvd(A, n, p=0)
 
 Compute partial singular value decomposition of `A` using a randomized
 algorithm.
@@ -39,7 +39,7 @@ algorithm.
 
 This function calls `rrange`, which uses naive randomized rangefinding to
 compute a basis for a subspace of dimension `n` (Algorithm 4.1 of
-[^Halko2011]), followed by `svdfact_restricted()`, which computes the
+[^Halko2011]), followed by `svd_restricted()`, which computes the
 exact SVD factorization on the restriction of `A` to this randomly selected
 subspace (Algorithm 5.1 of [^Halko2011]).
 
@@ -48,9 +48,9 @@ any of the randomized range finding algorithms to find a suitable subspace
 and feeding the result to one of the routines that computes the `SVD`
 restricted to that subspace.
 """
-function rsvdfact(A, n::Int, p::Int=0)
+function rsvd(A, n::Int, p::Int=0)
     Q = rrange(A, n+p)
-    svdfact_restricted(A, Q, n)
+    svd_restricted(A, Q, n)
 end
 
 """
@@ -80,7 +80,7 @@ algorithm.
 
 This function calls `rrange`, which uses naive randomized rangefinding to
 compute a basis for a subspace of dimension `n` (Algorithm 4.1 of
-[^Halko2011]), followed by `svdfact_restricted()`, which computes the
+[^Halko2011]), followed by `svd_restricted()`, which computes the
 exact SVD factorization on the restriction of `A` to this randomly selected
 subspace (Algorithm 5.1 of [^Halko2011]).
 
@@ -278,7 +278,7 @@ function rrange_f(A, l::Int)
 end
 
 """
-    svdfact_restricted(A, Q, n)
+    svd_restricted(A, Q, n)
 
 Compute the SVD factorization of `A` restricted to the subspace spanned by `Q`
 using exact projection.
@@ -297,7 +297,7 @@ using exact projection.
 
 Algorithm 5.1 of [^Halko2011]
 """
-function svdfact_restricted(A, Q, n::Int)
+function svd_restricted(A, Q, n::Int)
     B=Q'A
     S=svd!(B)
     SVD((Q*S.U)[:, 1:n], S.S[1:n], S.Vt[1:n, :])
@@ -329,7 +329,7 @@ function svdvals_restricted(A, Q, n::Int)
 end
 
 """
-    svdfact_re(A, Q)
+    svd_re(A, Q)
 
 Compute the SVD factorization of `A` restricted to the subspace spanned by `Q`
 using row extraction.
@@ -349,15 +349,15 @@ where `Ω` is a sample computed by `randn(n,l)` or even `srft(l)`.
 
 # See also
 
-A faster but less accurate variant of [`svdfact_restricted`](@ref) which uses the
-interpolative decomposition `idfact`.
+A faster but less accurate variant of [`svd_restricted`](@ref) which uses the
+interpolative decomposition `id`.
 
 # References
 
 Algorithm 5.2 of [^Halko2011]
 """
-function svdfact_re(A, Q)
-    F = idfact(Q)
+function svd_re(A, Q)
+    F = id(Q)
     X, J = F[:B], F[:P]
     R′, W′= qr(A[J, :])
     Z = X*R′
@@ -366,7 +366,7 @@ function svdfact_re(A, Q)
 end
 
 """
-    eigfact_restricted(A, Q)
+    eigen_restricted(A, Q)
 
 Compute the spectral (`Eigen`) factorization of `A` restricted to the subspace
 spanned by `Q` using row extraction.
@@ -385,14 +385,14 @@ spanned by `Q` using row extraction.
 
 Algorithm 5.3 of [^Halko2011]
 """
-function eigfact_restricted(A::Hermitian, Q)
+function eigen_restricted(A::Hermitian, Q)
     B = Q'A*Q
     E = eigen!(B)
     Eigen(E.values, Q*E.vectors)
 end
 
 """
-    eigfact_re(A, Q)
+    eigen_re(A, Q)
 
 Compute the spectral (`Eigen`) factorization of `A` restricted to the subspace
 spanned by `Q` using row extraction.
@@ -412,15 +412,15 @@ where `Ω` is a sample computed by `randn(n,l)` or even `srft(l)`.
 
 # See also
 
-A faster but less accurate variant of `eigfact_restricted()` which uses the
-interpolative decomposition `idfact()`.
+A faster but less accurate variant of `eigen_restricted()` which uses the
+interpolative decomposition `id()`.
 
 # References
 
 Algorithm 5.4 of [^Halko2011]
 """
-function eigfact_re(A::Hermitian, Q)
-    X, J = idfact(Q)
+function eigen_re(A::Hermitian, Q)
+    X, J = id(Q)
     F = qr!(X)
     V, R = F.Q, F.R
     Z=R*A[J, J]*R'
@@ -429,7 +429,7 @@ function eigfact_re(A::Hermitian, Q)
 end
 
 """
-    eigfact_nystrom(A, Q)
+    eigen_nystrom(A, Q)
 
 Compute the spectral (`Eigen`) factorization of `A` restricted to the subspace
 spanned by `Q` using the Nyström method.
@@ -446,18 +446,18 @@ spanned by `Q` using the Nyström method.
 
 # See also
 
-More accurate than [`eigfact_restricted`](@ref) but is restricted to matrices
+More accurate than [`eigen_restricted`](@ref) but is restricted to matrices
 that can be Cholesky decomposed.
 
 # References
 
 Algorithm 5.5 of [^Halko2011]
 """
-function eigfact_nystrom(A, Q)
+function eigen_nystrom(A, Q)
     B₁=A*Q
     B₂=Q'*B₁
-    C=cholfact!(B₂)
-    F=B₁*inv(C)
+    C=cholesky!(Hermitian(B₂))
+    F=B₁/C
     S=svd!(F)
     Eigen(S.S.^2, S.U)
 end
@@ -483,13 +483,13 @@ product involving `A`.
 
 Algorithm 5.6 of [^Halko2011]
 """
-function eigfact_onepass(A::Hermitian, Ω)
+function eigen_onepass(A::Hermitian, Ω)
     Y=A*Ω; Q = Matrix(qr!(Y).Q)
     B=(Q'Y)\(Q'Ω)
-    E=eigfact!(B)
-    Eigen(E[:values], Q*E[:vectors])
+    E=eigen!(B)
+    Eigen(E.values, Q*E.vectors)
 end
-function eigfact_onepass(A, Ω, Ω̃; At=A')
+function eigen_onepass(A, Ω, Ω̃; At=A')
     Y=A *Ω; Q = Matrix(qr!(Y).Q)
     Ỹ=At*Ω; Q̃ = Matrix(qr!(Ỹ).Q)
     #Want least-squares solution to (5.14 and 5.15)
@@ -497,12 +497,12 @@ function eigfact_onepass(A, Ω, Ω̃; At=A')
     B̃=(Q̃'Ỹ)\(Q'Ω̃)
     #Here is a very very very hacky way to solve the problem
     B=0.5(B + B̃')
-    E=eigfact!(B)
-    Eigen(E[:values], Q*E[:vectors])
+    E=eigen!(B)
+    Eigen(E.values, Q*E.vectors)
 end
 
 """
-    reig(A, l)
+    reigen(A, l)
 
 Compute the spectral (`Eigen`) decomposition of `A` using a randomized
 algorithm.
@@ -518,8 +518,8 @@ algorithm.
 
 # Implementation note
 
-This is a wrapper around `eigfact_onepass()` which uses the randomized
+This is a wrapper around `eigen_onepass()` which uses the randomized
 samples found using `srft(l)`.
 """
-reig(A::Hermitian, l::Int) = eigfact_onepass(A, srft(l))
-reig(A, l::Int) = eigfact_onepass(A, srft(l), srft(l))
+reigen(A::Hermitian, l::Int) = eigen_onepass(A, srft(l))
+reigen(A, l::Int) = eigen_onepass(A, srft(l), srft(l))
