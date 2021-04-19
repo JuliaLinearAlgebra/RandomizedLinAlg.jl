@@ -2,7 +2,7 @@ using Documenter, RandomizedLinAlg
 
 makedocs(
     modules = [RandomizedLinAlg],
-    format = :html,
+    format = Documenter.HTML(),
     doctest = false,
     clean = true,
     sitename = "RandomizedLinAlg.jl",
@@ -13,9 +13,5 @@ makedocs(
 
 deploydocs(
     repo = "github.com/haampie/RandomizedLinAlg.jl.git",
-    target = "build",
-    osname = "linux",
-    julia  = "1.0",
-    deps = nothing,
-    make = nothing,
+    target = "build"
 )
