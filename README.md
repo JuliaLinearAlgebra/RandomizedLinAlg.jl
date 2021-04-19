@@ -1,7 +1,7 @@
 # RandomizedLinAlg.jl
 
 [![Build Status](https://travis-ci.org/JuliaLinearAlgebra/RandomizedLinAlg.jl.svg?branch=master)](https://travis-ci.org/JuliaLinearAlgebra/RandomizedLinAlg.jl)
-**Documentation**: [![][docs-latest-img]][docs-latest-url]
+[![][docs-latest-img]][docs-latest-url]
 
 RandomizedLinAlg.jl is a [Julia](https://julialang.org/) package that provides randomized algorithms for numerical linear algebra as advocated in [1].
 
